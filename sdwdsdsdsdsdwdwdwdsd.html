@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 调整字体大小和下落速度
+        const FONT_PX = 30;
+        const FALL_SPEED = 0.4;
+
+        // 初始化画布尺寸
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // 列配置和状态
+        const columns = Math.floor(canvas.width / FONT_PX);
+        const drops = Array(columns).fill(0);
+        const texts = ['L', 'O', 'V', 'E'];
+        const charIndexes = Array(columns).fill(0);
+
+        // 动画循环
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < columns; i++) {
+                // 绘制粉色字符
+                ctx.fillStyle = '#FF69B4';
+                ctx.font = `${FONT_PX}px monospace`;
+                ctx.fillText(texts[charIndexes[i]], i * FONT_PX, drops[i] * FONT_PX);
+
+                // 控制下落速度
+                drops[i] += 1;
+
+                // 重置条件（触底或随机重置）
+                if (drops[i] * FONT_PX > canvas.height + FONT_PX || Math.random() > 0.97) {
+                    drops[i] = 0;
+                    charIndexes[i] = (charIndexes[i] + 1) % texts.length;
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // 启动动画
+        animate();
+    </script>
+</body>
+</html>
