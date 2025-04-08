@@ -40,38 +40,40 @@
         function animate() {
 
             // 用半透明黑色覆盖画布，实现渐隐拖尾效果（值越小拖尾越长）
-             ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+             ctx.fillStyle = 'rgba(0, 0, 0, 1)';
              ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 仅循环处理前2列（示例代码简化版，实际应该循环所有列）
-            for (let i = 0; i < 2000; i++) {
-                // 设置字符颜色为亮粉色
-                ctx.fillStyle = '#FF69B4';
-                // 设置等宽字体样式（字体大小由FONT_PX常量定义）
-                ctx.font = `${FONT_PX}px monospace`;
+             for(let j = 26; j > 0; j--) {
 
-                // 绘制当前字符：列位置i*FONT_PX，纵坐标drops[i]*FONT_PX
-                ctx.fillText(texts[3], i * FONT_PX, drops[i] * FONT_PX);
 
-                // 控制下落速度：每次循环下落1个字符高度（值越大下落越快）
-                drops[i] += 1;
-                // 再次绘制字符（可能试图制造重叠效果，但逻辑存在问题）
-                ctx.fillText(texts[2], i * FONT_PX, drops[i] * FONT_PX);
+                 // 仅循环处理前2列（示例代码简化版，实际应该循环所有列）
+                 for (let i = 0; i < columns; i++) {
+                     // 设置字符颜色为亮粉色
+                     ctx.fillStyle = '#FF69B4';
+                     // 设置等宽字体样式（字体大小由FONT_PX常量定义）
+                     ctx.font = `${FONT_PX}px monospace`;
 
-                drops[i] += 1;
-                // 再次绘制字符（可能试图制造重叠效果，但逻辑存在问题）
-                ctx.fillText(texts[1], i * FONT_PX, drops[i] * FONT_PX);
+                     ctx.fillText(texts[(j-1)%4], i * FONT_PX, (drops[i]-j) * FONT_PX);
 
-                drops[i] += 1;
-                // 再次绘制字符（可能试图制造重叠效果，但逻辑存在问题）
-                ctx.fillText(texts[0], i * FONT_PX, drops[i] * FONT_PX);
+                     if(j === 1){
+                         drops[i] += 0.5;
+                     }
 
-                // 重置条件：当字符超出画布底部，或随机数>0.97时（3%概率）
-                if (drops[i] * FONT_PX > canvas.height + FONT_PX || Math.random() > 0.97) {
-                    drops[i] = 0; // 重置下落位置到顶部
-                    charIndexes[i] = (charIndexes[i] + 1) % texts.length; // 切换到下一个字符
-                }
-            }
+                     // 重置条件：当字符超出画布底部，或随机数>0.97时（3%概率）
+                     if (drops[i] * FONT_PX > canvas.height + FONT_PX || Math.random() > 0.9997) {
+                         drops[i] = 0; // 重置下落位置到顶部
+                         charIndexes[i] = (charIndexes[i] + 1) % texts.length; // 切换到下一个字符
+                     }
+                 }
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+             }
+
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // 继续请求下一帧动画
 
