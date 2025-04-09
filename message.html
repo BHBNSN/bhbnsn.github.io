@@ -28,6 +28,33 @@
             "愿这美好化作永恒记忆"
         ];
 
+        // 黑客雨特效
+        class MatrixRain {
+            constructor() {
+                this.chars = 'LOVE';
+                this.reset(true);
+            }
+
+            reset(init) {
+                this.x = init ? Math.random() * canvas.width : Math.random() * canvas.width * 1.2;
+                this.y = -20;
+                this.speed = 2 + Math.random() * 3; // 多级速度
+                this.char = this.chars[Math.floor(Math.random() * 4)];
+                this.alpha = 0.5 + Math.random() * 0.5; // 随机透明度
+                this.size = 14 + Math.random() * 6; // 大小变化
+            }
+
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height * 1.2) this.reset();
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255,105,180,${this.alpha})`; // 粉色渐变
+                ctx.font = `${this.size}px Arial`;
+                ctx.fillText(this.char, this.x, this.y);
+            }
+        }
 
         // 文字粒子系统
         class TextParticle {
