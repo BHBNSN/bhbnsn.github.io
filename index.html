@@ -30,8 +30,12 @@
         // 创建与列数相同的数组，记录每列字符的当前下落位置（初始都在顶部0位置）
         const drops = Array(columns).fill(0);
 
+        const oldDrops = Array(columns).fill(0);
+
         // 定义要循环显示的字符数组（LOVE四个字母）
         const texts = ['L', 'O', 'V', 'E'];
+
+        const texttest = ['1', '2', '3', '4'];
 
         // 创建与列数相同的数组，记录每列当前使用的字符索引（初始都从第0个字符开始）
         const charIndexes = Array(columns).fill(0);
@@ -55,15 +59,31 @@
 
                      ctx.fillText(texts[(j-1)%4], i * FONT_PX, (drops[i]-j) * FONT_PX);
 
+                     ctx.fillText(texts[(j-1)%4], i * FONT_PX, (oldDrops[i]-j) * FONT_PX);
+
+
+
                      if(j === 1){
                          drops[i] += 0.5;
+                         if(oldDrops[i] > 0){
+                             oldDrops[i] += 0.5;
+                         }
                      }
 
                      // 重置条件：当字符超出画布底部，或随机数>0.97时（3%概率）
-                     if ((drops[i] - 26) * FONT_PX > canvas.height + FONT_PX || Math.random() > 0.9997) {
+                     if ((drops[i] - 26) * FONT_PX > canvas.height + FONT_PX) {
                          drops[i] = 0; // 重置下落位置到顶部
-                         charIndexes[i] = (charIndexes[i] + 1) % texts.length; // 切换到下一个字符
                      }
+
+                     if (Math.random() > 0.9997 && oldDrops[i] < 1 && drops[i] > 26) {
+                         oldDrops[i] = drops[i];
+                         drops[i] = 0; // 重置下落位置到顶部
+                     }
+
+                     if ((oldDrops[i] - 26) * FONT_PX > canvas.height + FONT_PX) {
+                         oldDrops[i] = 0; // 重置下落位置到顶部
+                     }
+
                  }
 
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
