@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 画布自适应
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chineseText = [
+            "月色如水静静流淌在无垠的夜空",
+            "繁星点点像是撒落的银砂",
+            "晚风轻拂带来远处花香",
+            "天地间仿佛只剩你我",
+            "愿这美好化作永恒记忆"
+        ];
+
+        // 黑客雨特效
+        class MatrixRain {
+            constructor() {
+                this.chars = 'LOVE';
+                this.reset(true);
+            }
+
+            reset(init) {
+                this.x = init ? Math.random() * canvas.width : Math.random() * canvas.width * 1.2;
+                this.y = -20;
+                this.speed = 2 + Math.random() * 3; // 多级速度
+                this.char = this.chars[Math.floor(Math.random() * 4)];
+                this.alpha = 0.5 + Math.random() * 0.5; // 随机透明度
+                this.size = 14 + Math.random() * 6; // 大小变化
+            }
+
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height * 1.2) this.reset();
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255,105,180,${this.alpha})`; // 粉色渐变
+                ctx.font = `${this.size}px Arial`;
+                ctx.fillText(this.char, this.x, this.y);
+            }
+        }
+
+        // 文字粒子系统
+        class TextParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = 1.2; // 缩小粒子半径
+                this.baseX = x;
+                this.baseY = y;
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        // 系统参数
+        const matrixDrops = Array(200).fill().map(() => new MatrixRain());
+        let textParticles = [];
+        let currentTextIndex = 0;
+
+        // 自适应文字生成
+        function createTextParticles(text) {
+            let fontSize = 60;
+            ctx.save();
+
+            // 动态调整字体大小
+            do {
+                ctx.font = `${fontSize}px Microsoft Yahei`;
+                var textWidth = ctx.measureText(text).width;
+                fontSize -= 2;
+            } while (textWidth > canvas.width * 0.8 && fontSize > 20);
+
+            // 创建粒子画布
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = textWidth;
+            tempCanvas.height = 80;
+
+            tempCtx.font = `${fontSize}px Microsoft Yahei`;
+            tempCtx.textAlign = 'center';
+            tempCtx.fillText(text, textWidth/2, 50);
+
+            const data = tempCtx.getImageData(0, 0, textWidth, 80).data;
+            const particles = [];
+
+            // 精确粒子采样
+            for(let y=0; y<80; y+=3){
+                for(let x=0; x<textWidth; x+=2){
+                    if(data[(y * textWidth + x) * 4 + 3] > 128) {
+                        particles.push(new TextParticle(
+                            canvas.width/2 - textWidth/2 + x,
+                            canvas.height/2 - 30 + y
+                        ));
+                    }
+                }
+            }
+            ctx.restore();
+            return particles;
+        }
+
+        // 动画循环
+        function animate() {
+            // 黑客雨拖尾效果
+            ctx.fillStyle = 'rgba(0,0,0,0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 渲染矩阵雨
+            matrixDrops.forEach(drop => {
+                drop.update();
+                drop.draw();
+            });
+
+            // 渲染文字粒子
+            textParticles.forEach(p => p.draw());
+
+            requestAnimationFrame(animate);
+        }
+
+        // 文字切换
+        function changeText() {
+            currentTextIndex = (currentTextIndex + 1) % chineseText.length;
+            textParticles = createTextParticles(chineseText[currentTextIndex]);
+            setTimeout(changeText, 3000);
+        }
+
+        // 启动
+        changeText();
+        animate();
+    </script>
+</body>
+</html>
