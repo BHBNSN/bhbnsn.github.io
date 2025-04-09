@@ -60,7 +60,7 @@
                      }
 
                      // 重置条件：当字符超出画布底部，或随机数>0.97时（3%概率）
-                     if (drops[i] * FONT_PX > canvas.height + FONT_PX || Math.random() > 0.9997) {
+                     if ((drops[i] - 26) * FONT_PX > canvas.height + FONT_PX || Math.random() > 0.9997) {
                          drops[i] = 0; // 重置下落位置到顶部
                          charIndexes[i] = (charIndexes[i] + 1) % texts.length; // 切换到下一个字符
                      }
